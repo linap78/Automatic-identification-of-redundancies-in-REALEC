@@ -11,9 +11,9 @@ between_re = re.compile(r"[Bb]etween \d{2,4} (year(s)?)|[Bb]etween \d{2,4} and \
 until_re = re.compile(r"[Uu]ntil \d{2,4} (year(s)?)")
 be_re = re.compile(r"(be|am|is|are|was|were|aged|by) (over )?\d{2}(-\d{2})? (year(s)?)")
 than_re = re.compile(r"(older|younger) (than )?\d{2} (year(s)?)")
+
 old_re = re.compile(r"year(s)? old")
 two_re = re.compile(r"[Ii]n the year 2\d{3}")
-# нужны ещё регулярки для двухтысячного
 
 re_list = [be_re, between_re, from_re, in_re, than_re, until_re]
 
@@ -29,13 +29,12 @@ for doc in os.listdir():
             for sent in sents:
                 for re in re_list:
                     if re.findall(sent.text) and not old_re.findall(sent.text) and not two_re.findall(sent.text):
-                        text_name_list.append(doc)
-                        text_list.append(sent)
-                        if "year" in re.findall(sent.text):
-                            probable_error_span_list.append("year")
-                        else:
-                            probable_error_span_list.append("years")
-
+                        for tuple in re.findall(sent.text):
+                            for word in [i for i in tuple]:
+                                if word == "year" or word == "years":
+                                    probable_error_span_list.append(word)
+                                    text_name_list.append(doc)
+                                    text_list.append(sent)
 
 data = {
     "text_name": text_name_list,
